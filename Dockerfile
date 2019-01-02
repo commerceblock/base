@@ -1,13 +1,19 @@
 FROM centos:centos7.4.1708
 
+ENV GITHUB https://github.com
 ENV GOSU_VERSION 1.10
 ENV GOSU_ARCH amd64
-ENV GOSU_URL https://github.com/tianon/gosu/releases/download
+ENV GOSU_URL ${GITHUB}/tianon/gosu/releases/download
 ENV GOSU_APP ${GOSU_URL}/${GOSU_VERSION}/gosu-${GOSU_ARCH}
 ENV GOSU_ASC ${GOSU_URL}/${GOSU_VERSION}/gosu-${GOSU_ARCH}.asc
 ENV DB4_VERSION 4.8.30.NC
 ENV DB4_HASH 12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef
 ENV DB4_URL http://download.oracle.com/berkeley-db/db-${DB4_VERSION}.tar.gz
+ENV MONGOC 1.13.0
+ENV MONGOC_URL ${GITHUB}/mongodb/mongo-c-driver/releases/download/${MONGOC}/\
+mongo-c-driver-${MONGOC}.tar.gz
+ENV MONGOCXX r3.4.0
+ENV MONGOCXX_URL ${GITHUB}/mongodb/mongo-cxx-driver/archive/${MONGOCXX}.tar.gz
 
 # Setup required system packages
 RUN set -x \
@@ -53,6 +59,7 @@ RUN set -x \
         iproute \
         jq \
         python36 \
+        cmake3 \
     && ln -s /usr/bin/python36 /usr/bin/python3 \
     && yum clean all \
     && rm -rf /var/cache/yum
@@ -81,9 +88,9 @@ RUN set -x \
 # Build Berkeley DB
 RUN set -x \
     && cd /usr/src \
-    && curl ${DB4_URL} -o db-${DB4_VERSION} \
-    && echo "${DB4_HASH} db-${DB4_VERSION}" | sha256sum -c || exit 1 \
-    && tar zxvf db-${DB4_VERSION} \
+    && curl -OL ${DB4_URL} \
+    && echo "${DB4_HASH} db-${DB4_VERSION}.tar.gz" | sha256sum -c || exit 1 \
+    && tar zxvf db-${DB4_VERSION}.tar.gz \
     && cd db-${DB4_VERSION}/build_unix \
     && ../dist/configure --prefix=/usr --enable-compat185 \
         --enable-dbm --disable-static --enable-cxx --with-pic \
@@ -91,4 +98,31 @@ RUN set -x \
     && make install \
     && make clean \
     && cd /usr/src \
-    && rm -rf /usr/src/db-${DB4_VERSION}
+    && rm -rf /usr/src/db-${DB4_VERSION}*
+
+# Build MongoDB C driver
+RUN set -x \
+    && cd /usr/src \
+    && curl -LO ${MONGOC_URL} \
+    && tar zxvf mongo-c-driver-${MONGOC}.tar.gz \
+    && cd mongo-c-driver-${MONGOC}/build \
+    && cmake3 -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
+        -DCMAKE_INSTALL_PREFIX=/usr/local .. \
+    && make -j$(nproc) \
+    && make install \
+    && cd /usr/src \
+    && rm -rf /usr/src/mongo-c-driver*
+
+# Build Mongo C++ driver
+RUN set -x \
+    && cd /usr/src \
+    && curl -LO ${MONGOCXX_URL} \
+    && tar zxvf ${MONGOCXX}.tar.gz \
+    && cd mongo-cxx-driver-${MONGOCXX}/build \
+    && cmake3 -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_PREFIX_PATH=/usr/local .. \
+    && make -j$(nproc) \
+    && make install \
+    && cd /usr/src \
+    && rm -rf /usr/src/mongo-cxx-driver*
