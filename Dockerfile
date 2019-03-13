@@ -1,4 +1,4 @@
-FROM centos:centos7.4.1708
+FROM centos:centos7.6.1810
 
 ENV GITHUB https://github.com
 ENV GOSU_VERSION 1.10
@@ -60,7 +60,7 @@ RUN set -x \
         jq \
         python36 \
         cmake3 \
-    && ln -s /usr/bin/python36 /usr/bin/python3 \
+    && ln -s -f /usr/bin/python36 /usr/bin/python3 \
     && yum clean all \
     && rm -rf /var/cache/yum
 
