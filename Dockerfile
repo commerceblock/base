@@ -58,6 +58,7 @@ RUN set -x \
         zeromq-devel \
         iproute \
         jq \
+        bc \
         python36 \
         cmake3 \
     && ln -s -f /usr/bin/python36 /usr/bin/python3 \
