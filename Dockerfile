@@ -14,9 +14,6 @@ RUN set -x \
     && dnf install -y 'dnf-command(config-manager)' \
     && dnf config-manager --set-enabled PowerTools \
     && yum clean all \
-    && rm -rf /var/cache/yum
-
-RUN set -x \
     && yum install -y \
         gcc \
         gcc-c++ \
