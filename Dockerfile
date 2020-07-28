@@ -1,4 +1,4 @@
-\1;95;0cFROM centos:8.2.2004
+FROM centos:8.2.2004
 
 ENV GITHUB https://github.com
 ENV GOSU_VERSION 1.12
