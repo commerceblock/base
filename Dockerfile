@@ -1,4 +1,4 @@
-FROM centos:8.2.2004
+\1;95;0cFROM centos:8.2.2004
 
 ENV GITHUB https://github.com
 ENV GOSU_VERSION 1.12
@@ -57,6 +57,7 @@ RUN set -x \
         bc \
         python38 \
         cmake3 \
+	wget \
     && yum clean all \
     && rm -rf /var/cache/yum \
     && pip3 install zmq
@@ -77,8 +78,10 @@ RUN set -x \
 
 #curlpp
 RUN set -x \
-    && git clone --branch v0.8.1 https://github.com/jpbarrette/curlpp.git \
-    && cd curlpp \
+    && wget https://github.com/jpbarrette/curlpp/archive/v0.8.1.tar.gz \
+    && echo "97e3819bdcffc3e4047b6ac57ca14e04af85380bd93afe314bee9dd5c7f46a0a v0.8.1.tar.gz" | sha256sum -c \
+    && tar xvfz v0.8.1.tar.gz \
+    && cd curlpp-0.8.1 \
     && mkdir build \
     && cd build \
     && cmake .. \
