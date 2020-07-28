@@ -7,6 +7,8 @@ ENV GOSU_URL ${GITHUB}/tianon/gosu/releases/download
 ENV GOSU_APP ${GOSU_URL}/${GOSU_VERSION}/gosu-${GOSU_ARCH}
 ENV GOSU_ASC ${GOSU_URL}/${GOSU_VERSION}/gosu-${GOSU_ARCH}.asc
 ENV RPM_URL https://rpmfind.net/linux/fedora/linux/releases/32/Everything/x86_64/os/Packages/c
+ENV CURLPP_LIBS -L/usr/local/lib64 -lcurl -lcurlpp
+ENV CURLPP_CFLAGS -Iinclude
 
 # Setup required system packages
 RUN set -x \
@@ -60,8 +62,6 @@ RUN set -x \
         bc \
         python38 \
         cmake3 \
-    && export CURLPP_LIBS="-L/usr/local/lib64 -lcurl -lcurlpp" \
-    && export CURLPP_CFLAGS=$(curlpp-config --cflags) \
     && yum clean all \
     && rm -rf /var/cache/yum \
     && pip3 install zmq
