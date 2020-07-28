@@ -61,7 +61,7 @@ RUN set -x \
     && rm -rf /var/cache/yum \
     && pip3 install zmq
 
-# gosu
+
 RUN set -x \
     && adduser -m bitcoin \
     && chown bitcoin:bitcoin /home/bitcoin \
@@ -74,3 +74,15 @@ RUN set -x \
 	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	&& chmod +x /usr/local/bin/gosu \
     && gosu nobody true
+
+#curlpp
+RUN set -x \
+    && git clone --branch v0.8.1 https://github.com/jpbarrette/curlpp.git \
+    && cd curlpp \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make \
+    && make install \
+    && export CURLPP_LIBS=`curlpp-config --libs` \
+    && export CURLPP_CFLAGS=`curlpp-config --cflags` 
