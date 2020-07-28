@@ -88,4 +88,5 @@ RUN set -x \
     && make \
     && make install \
     && export CURLPP_LIBS=`curlpp-config --libs` \
-    && export CURLPP_CFLAGS=`curlpp-config --cflags` 
+    && export CURLPP_CFLAGS=`curlpp-config --cflags`\
+    && export LD_LIBRARY_PATH=/usr/local/lib64 
